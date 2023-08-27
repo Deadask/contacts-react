@@ -1,20 +1,61 @@
-import React, { useState } from 'react'
-import { Container, Row, Col, Form, FormGroup, FormControl, InputGroup, Button } from 'react-bootstrap'
+import React, { useState } from 'react';
+import { Container, Row, Col, Form, FormGroup, FormControl, InputGroup, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AddContact = () => {
+    
+    const [firstName, setFirstName] = useState('');
+    const [middleName, setMiddleName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [number, setNumber] = useState('');
+    const [email, setEmail] = useState('');
 
-    const [firstName, setFirstName] = useState('')
-    const [middleName, setMiddleName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [number, setNumber] = useState('')
-    const [email, setEmail] = useState('')
+    const contacts = useSelector((state)=> state);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    
 
+    // Add Contact to the reducer
     const handleSubmit = (e) => {
         e.preventDefault();
         
-    }
-
-
+        // validation checks for required fields
+        const checkEmail = contacts.find((contact) => contact.email === email);
+        
+        
+        const checkNumber = contacts.find((contact) => contact.number === number);
+       
+        
+        // checks if any field are empty
+        if (!firstName || !lastName || !email || !middleName || !number) {
+            return toast.warning("Please fill in all fields");
+        }
+        // if email exists, warn to change email
+        if (checkEmail) {
+            return toast.warning("This email already exists");
+        }
+        // if number exists, warn to change number
+        if (checkNumber) {
+            return toast.warning("This number already exists");
+        }
+    
+    // data to be pushed into the list of contacts
+    const data ={
+        id: `${parseInt(contacts[contacts.length - 1].id) + 1}`,
+        firstName,
+        middleName,
+        lastName,
+        email,
+        number
+    };
+    // Add the contact thru the reducer using dispatcher
+    dispatch({type: "ADD_CONTACT",payload: data});
+    toast.success("Contact added");
+    navigate('/');
+    };
+    
 return (
     <Container className='my-5'>
         <Row>  
